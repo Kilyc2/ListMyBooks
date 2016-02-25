@@ -1,17 +1,24 @@
 package com.android.listmybooks.activities;
 
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.listmybooks.R;
 import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.DropboxAPI.Entry;
 import com.dropbox.client2.android.AndroidAuthSession;
+import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.AppKeyPair;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LinkActivity extends AppCompatActivity {
 
@@ -24,6 +31,7 @@ public class LinkActivity extends AppCompatActivity {
 
     DropboxAPI<AndroidAuthSession> dropboxApi;
     private boolean isLoggedInDropbox;
+    private ProgressBar progressBarSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +41,7 @@ public class LinkActivity extends AppCompatActivity {
         dropboxApi = new DropboxAPI<>(session);
 
         setContentView(R.layout.activity_link);
+        progressBarSearch = (ProgressBar) findViewById(R.id.progress_bar_search);
         Button linkButton = (Button) findViewById(R.id.link_button);
         linkButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,6 +52,9 @@ public class LinkActivity extends AppCompatActivity {
 
         // Display the proper UI state if logged in or not
         setLoggedIn(dropboxApi.getSession().isLinked());
+        if (isLoggedInDropbox) {
+            linkButton.setVisibility(View.GONE);
+        }
     }
 
     private void onClickLinkToDropbox() {
@@ -93,6 +105,10 @@ public class LinkActivity extends AppCompatActivity {
     private void setLoggedIn(boolean loggedIn) {
         isLoggedInDropbox = loggedIn;
         showToast(loggedIn ? "LoggedIn" : "LoggedOut");
+        if (loggedIn) {
+            SearchEpubs searchEpubsTask = new SearchEpubs();
+            searchEpubsTask.execute();
+        }
     }
 
     private void showToast(String msg) {
@@ -144,5 +160,34 @@ public class LinkActivity extends AppCompatActivity {
         AndroidAuthSession session = new AndroidAuthSession(appKeyPair);
         loadAuth(session);
         return session;
+    }
+
+    private class SearchEpubs extends AsyncTask<Void, Void, List<Entry>> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressBarSearch.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected List<Entry> doInBackground(Void... params) {
+            List<Entry> epubs;
+            try {
+                epubs = dropboxApi.search("", ".epub", 0, false);
+            } catch (DropboxException e) {
+                epubs = new ArrayList<>();
+            }
+            return epubs;
+        }
+
+        @Override
+        protected void onPostExecute(List<Entry> epubs) {
+            super.onPostExecute(epubs);
+            for (Entry epub : epubs) {
+                Log.v("EPUBS", epub.path);
+            }
+            progressBarSearch.setVisibility(View.GONE);
+        }
     }
 }
