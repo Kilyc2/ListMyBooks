@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">List My Books</string>
     <string name="link_button">Link to Dropbox</string>
+    <string name="title_book_list">Books</string>
+    <string name="title_book_detail">Book Detail</string>
 </resources>
