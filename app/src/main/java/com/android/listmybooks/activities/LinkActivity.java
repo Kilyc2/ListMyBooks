@@ -1,6 +1,8 @@
 package com.android.listmybooks.activities;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -8,8 +10,11 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 
 import com.android.listmybooks.R;
+import com.android.listmybooks.models.Book;
 import com.android.listmybooks.services.dropbox.FindEpubAsyncTask;
 import com.android.listmybooks.services.dropbox.SessionManager;
+
+import java.util.ArrayList;
 
 public class LinkActivity extends AppCompatActivity {
 
@@ -72,9 +77,29 @@ public class LinkActivity extends AppCompatActivity {
      * Convenience function to change UI state based on being logged in
      */
     private void doLogIn() {
-        linkButton.setVisibility(View.GONE);
-        new FindEpubAsyncTask(this.spinner, this.sessionManager.getSession(),
-                getExternalFilesDir(null)).execute();
+        linkButton.setVisibility(View.INVISIBLE);
+        // Set portrait orientation
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        new FindEpubAsyncTask(this, this.sessionManager.getSession()).execute();
+    }
+
+    public void startListActivity(ArrayList<Book> books) {
+        Intent intent = new Intent(this, BookListActivity.class);
+        intent.putParcelableArrayListExtra(BookListActivity.KEY_BOOKS, books);
+        startActivity(intent);
+        finish();
+    }
+
+    public void setSpinnerVisible() {
+        this.spinner.setVisibility(View.VISIBLE);
+    }
+
+    public String getExternalFilesDirPath() {
+        return getExternalFilesDir(null).getPath();
+    }
+
+    public void setSpinnerInvisible() {
+        this.spinner.setVisibility(View.INVISIBLE);
     }
 
     /**
