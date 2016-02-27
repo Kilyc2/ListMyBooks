@@ -30,4 +30,11 @@
         <include layout="@layout/book_list" />
     </FrameLayout>
 
+    <ProgressBar
+        android:id="@+id/progress_bar_library"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:foregroundGravity="center_horizontal"
+        android:visibility="gone" />
+
 </android.support.design.widget.CoordinatorLayout>

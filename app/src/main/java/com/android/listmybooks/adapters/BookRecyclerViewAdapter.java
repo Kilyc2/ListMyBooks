@@ -1,5 +1,9 @@
 package com.android.listmybooks.adapters;
 
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,19 +12,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.listmybooks.R;
+import com.android.listmybooks.activities.BookDetailActivity;
+import com.android.listmybooks.fragments.BookDetailFragment;
 import com.android.listmybooks.models.Book;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class BookRecyclerViewAdapter
         extends RecyclerView.Adapter<BookRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Book> books;
+    private final ArrayList<Book> books;
     private final boolean isTwoPane;
+    private final FragmentManager fragmentManager;
 
-    public BookRecyclerViewAdapter(List<Book> books, boolean isTwoPane) {
+    public BookRecyclerViewAdapter(ArrayList<Book> books, boolean isTwoPane,
+                                   FragmentManager fragmentManager) {
         this.books = books;
         this.isTwoPane = isTwoPane;
+        this.fragmentManager = fragmentManager;
     }
 
     @Override
@@ -40,11 +49,18 @@ public class BookRecyclerViewAdapter
             @Override
             public void onClick(View v) {
                 if (isTwoPane) {
-                    //TODO
-
+                    Bundle arguments = new Bundle();
+                    arguments.putParcelable(BookDetailFragment.ARG_BOOK, holder.book);
+                    BookDetailFragment fragment = new BookDetailFragment();
+                    fragment.setArguments(arguments);
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.book_detail_container, fragment)
+                            .commit();
                 } else {
-                    //TODO
-
+                    Context context = v.getContext();
+                    Intent intent = new Intent(context, BookDetailActivity.class);
+                    intent.putExtra(BookDetailFragment.ARG_BOOK, holder.book);
+                    context.startActivity(intent);
                 }
             }
         });

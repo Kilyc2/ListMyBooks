@@ -9,22 +9,36 @@ import android.os.Parcelable;
 import com.android.listmybooks.helpers.DateHelper;
 import com.android.listmybooks.services.epubreader.EpubManager;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 public class Book implements Parcelable {
 
+    private final static String SEPARATOR = ";";
+
+    private long id;
     private String title;
     private List<String> authors;
     private String coverPath;
     private String date;
 
     public Book(String path, String date) {
+        id = 0;
         EpubManager epubManager = new EpubManager(path);
         setTitle(epubManager.getTitle());
         setAuthors(epubManager.getAuthors());
         setCoverPath(epubManager.getCoverImagePath());
         setDate(date);
+    }
+
+    public Book(long id, String title, String authors, String coverPath, String date) {
+        this.id = id;
+        this.title = title;
+        setAuthors(authors);
+        this.coverPath = coverPath;
+        this.date = date;
     }
 
     protected Book(Parcel in) {
@@ -56,6 +70,15 @@ public class Book implements Parcelable {
         this.authors = authors;
     }
 
+    private void setAuthors(String authors) {
+        this.authors = new ArrayList<>();
+        if (authors.isEmpty()) {
+            this.authors.add("Anonymous");
+        } else {
+            Collections.addAll(this.authors, authors.split(SEPARATOR));
+        }
+    }
+
     private void setCoverPath(String coverPath) {
         this.coverPath = coverPath;
     }
@@ -64,12 +87,28 @@ public class Book implements Parcelable {
         this.date = date;
     }
 
+    public long getId() {
+        return id;
+    }
+
     public String getTitle() {
         return title;
     }
 
     public List<String> getAuthors() {
         return authors;
+    }
+
+    public String getAuthorsForDb() {
+        String authorsString = "";
+        for (String author : authors) {
+            authorsString = authorsString.concat(author).concat(SEPARATOR);
+        }
+        return authorsString;
+    }
+
+    public String getCoverPath() {
+        return coverPath;
     }
 
     public Bitmap getCover() {
@@ -87,6 +126,10 @@ public class Book implements Parcelable {
         return DateHelper.parseDate(date);
     }
 
+    public String getDateForDb() {
+        return date;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -94,6 +137,7 @@ public class Book implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
         dest.writeString(title);
         dest.writeStringList(authors);
         dest.writeString(coverPath);
@@ -101,6 +145,7 @@ public class Book implements Parcelable {
     }
 
     private void readToParcel(Parcel in) {
+        id = in.readLong();
         title = in.readString();
         authors = in.createStringArrayList();
         coverPath = in.readString();

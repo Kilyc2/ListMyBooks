@@ -4,4 +4,6 @@
     <string name="title_book_list">List My Books</string>
     <string name="title_book_detail">Book Detail</string>
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit</string>
+    <string name="action_share">Share</string>
+    <string name="share_text">A must read book:</string>
 </resources>

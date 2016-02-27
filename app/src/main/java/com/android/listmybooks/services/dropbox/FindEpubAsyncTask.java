@@ -1,9 +1,10 @@
 package com.android.listmybooks.services.dropbox;
 
+import android.content.ContentResolver;
 import android.os.AsyncTask;
-import android.util.Log;
 
-import com.android.listmybooks.activities.LinkActivity;
+import com.android.listmybooks.activities.LinkDropboxActivity;
+import com.android.listmybooks.data.BooksTable;
 import com.android.listmybooks.helpers.FileHelper;
 import com.android.listmybooks.models.Book;
 import com.dropbox.client2.DropboxAPI;
@@ -12,15 +13,14 @@ import com.dropbox.client2.android.AndroidAuthSession;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-public class FindEpubAsyncTask extends AsyncTask<Void, Void, ArrayList<Book>> {
+public class FindEpubAsyncTask extends AsyncTask<Void, Void, Void> {
 
-    private LinkActivity activity;
+    private LinkDropboxActivity activity;
     private ApiManager apiManager;
 
-    public FindEpubAsyncTask(LinkActivity activity, AndroidAuthSession session) {
+    public FindEpubAsyncTask(LinkDropboxActivity activity, AndroidAuthSession session) {
         this.activity = activity;
         this.apiManager = new ApiManager(session);
     }
@@ -28,62 +28,59 @@ public class FindEpubAsyncTask extends AsyncTask<Void, Void, ArrayList<Book>> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        this.activity.setSpinnerVisible();
+        this.activity.onPreExecuteAsyncTask();
     }
 
     @Override
-    protected void onPostExecute(ArrayList<Book> books) {
-        super.onPostExecute(books);
-        this.activity.setSpinnerInvisible();
-        this.activity.startListActivity(books);
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+        this.activity.onPostExecuteAsyncTask();
     }
 
     @Override
-    protected ArrayList<Book> doInBackground(Void... params) {
-        ArrayList<Book> books = new ArrayList<>();
-        List<Entry> epubs = getEpubs();
+    protected Void doInBackground(Void... params) {
+        this.activity.showMessage("Searching .epub files from Dropbox");
+        List<Entry> epubs = getEpubsFromApi();
+        this.activity.showMessage("Preparing library");
         for (Entry epub : epubs) {
             try {
-                String path = getEpubPath(epub);
-                String date = epub.modified;
-                books.add(new Book(path, date));
+                prepareEpub(epub);
             } catch (IOException ioe) {
-                Log.e("READ", "can't read ".concat(epub.fileName()));
+                this.activity.showMessage("Can't open ".concat(epub.fileName()));
             }
         }
-        return books;
+        return null;
     }
 
-    private List<DropboxAPI.Entry> getEpubs() {
+    private List<DropboxAPI.Entry> getEpubsFromApi() {
         return this.apiManager.searchFiles("", ".epub");
     }
 
-    private String getEpubPath(Entry epub) throws IOException {
-        File file = getFile(epub);
-        return file.getPath();
-    }
-
-    private File getFile(Entry epub) throws IOException {
+    private boolean prepareEpub(Entry epub) throws IOException {
         File file = FileHelper.createFile(this.activity.getExternalFilesDirPath(), epub.fileName());
-        if (prepareFileInMemory(file, epub)) {
-            return file;
-        }
-        return new File("");
+        return prepareEpubInMemory(epub, file);
     }
 
-    private boolean prepareFileInMemory(File file, Entry epub) {
-        return isSizeEquals(file.length(), epub.bytes) ||
-                this.apiManager.downloadFile(file, epub.path);
+    private boolean prepareEpubInMemory(Entry epub, File file) {
+        return isSizeEquals(epub.bytes, file.length()) || saveBookInMemory(epub, file);
+    }
+
+    private boolean saveBookInMemory(Entry epub, File file) {
+        this.activity.showMessage(epub.fileName().concat(" is being added to the library"));
+        boolean isDonwloaded = this.apiManager.downloadFile(file, epub.path);
+        if (isDonwloaded) {
+            Book book = new Book(file.getPath(), epub.modified);
+            saveBookInDB(book);
+        }
+        return isDonwloaded;
+    }
+
+    private void saveBookInDB(Book book) {
+        ContentResolver contentResolver = this.activity.getContentResolver();
+        contentResolver.insert(BooksTable.getContentUri(), BooksTable.getValuesBook(book));
     }
 
     private boolean isSizeEquals(long fileSize, long entrySize) {
         return fileSize == entrySize;
     }
-
-    private void createFileIfNotExists(File file) throws IOException {
-        if (!file.exists()) {
-            file.createNewFile();
-        }
-    }
-
 }
