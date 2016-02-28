@@ -44,7 +44,7 @@ public class FetchBooksTask extends AsyncTask<Void, Void, List<Book>> {
     protected List<Book> doInBackground(Void... params) {
         ContentResolver contentResolver = this.weakActivity.get().getContentResolver();
         Cursor cursor = contentResolver.query(BooksTable.getContentUri(),
-                null, null, null, null);
+                null, null, null, BooksTable.COLUMN_TITLE);
         List<Book> books = new ArrayList<>();
         if(CursorHelper.isValidCursor(cursor)) {
             do {
