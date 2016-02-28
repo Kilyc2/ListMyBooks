@@ -1,31 +1,29 @@
 package com.android.listmybooks.activities;
 
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.ProgressBar;
 
 import com.android.listmybooks.R;
+import com.android.listmybooks.adapters.BookRecyclerViewAdapter;
+import com.android.listmybooks.models.Book;
 import com.android.listmybooks.services.FetchBooksTask;
 
 import java.util.ArrayList;
+import java.util.List;
 
-/**
- * An activity representing a list of Books. This activity
- * has different presentations for handset and tablet-size devices. On
- * handsets, the activity presents a list of items, which when touched,
- * lead to a {@link BookDetailActivity} representing
- * item details. On tablets, the activity presents the list of items and
- * item details side-by-side using two vertical panes.
- */
-public class BookListActivity extends BookLibraryActivity {
+public class BookListActivity extends AppCompatActivity {
 
     private final static String KEY_STATE_BOOKS = "kStateBooks";
-
-    /**
-     * Whether or not the activity is in two-pane mode, i.e. running on a tablet
-     * device.
-     */
+    protected View recyclerView;
+    protected List<Book> booksInLibrary;
+    protected boolean isTwoPane;
+    protected ProgressBar spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,22 +45,33 @@ public class BookListActivity extends BookLibraryActivity {
         }
 
         if (findViewById(R.id.book_detail_container) != null) {
-            // The detail container view will be present only in the
-            // large-screen layouts (res/values-w900dp).
-            // If this view is present, then the
-            // activity should be in two-pane mode.
             isTwoPane = true;
         }
-
         recyclerView = findViewById(R.id.book_list);
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
 
     }
 
+    public void onPreExecuteAsyncTask() {
+        this.spinner.setVisibility(View.VISIBLE);
+    }
+
+    public void onPostExecuteAsyncTask(List<Book> books) {
+        this.booksInLibrary = books;
+        setupRecyclerView((RecyclerView) recyclerView);
+        this.spinner.setVisibility(View.INVISIBLE);
+    }
+
+    protected void setupRecyclerView(@NonNull RecyclerView recyclerView) {
+        recyclerView.setAdapter(new BookRecyclerViewAdapter(this.booksInLibrary, this.isTwoPane,
+                getSupportFragmentManager()));
+    }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(KEY_STATE_BOOKS, booksInLibrary);
+        outState.putParcelableArrayList(KEY_STATE_BOOKS,
+                (ArrayList<? extends Parcelable>) this.booksInLibrary);
     }
 }

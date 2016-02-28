@@ -3,7 +3,7 @@ package com.android.listmybooks.services.dropbox;
 import android.content.ContentResolver;
 import android.os.AsyncTask;
 
-import com.android.listmybooks.activities.LinkDropboxActivity;
+import com.android.listmybooks.activities.LinkActivity;
 import com.android.listmybooks.data.BooksTable;
 import com.android.listmybooks.helpers.FileHelper;
 import com.android.listmybooks.models.Book;
@@ -17,10 +17,10 @@ import java.util.List;
 
 public class FindEpubAsyncTask extends AsyncTask<Void, Void, Void> {
 
-    private LinkDropboxActivity activity;
+    private LinkActivity activity;
     private ApiManager apiManager;
 
-    public FindEpubAsyncTask(LinkDropboxActivity activity, AndroidAuthSession session) {
+    public FindEpubAsyncTask(LinkActivity activity, AndroidAuthSession session) {
         this.activity = activity;
         this.apiManager = new ApiManager(session);
     }

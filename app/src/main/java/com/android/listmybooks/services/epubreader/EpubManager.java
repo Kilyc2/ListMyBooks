@@ -24,9 +24,7 @@ public class EpubManager {
     public EpubManager(String epubPath) {
         this.epubPath = epubPath;
         try {
-            // find InputStream for book
             InputStream epubInputStream = new FileInputStream(this.epubPath);
-            // Load Book from inputStream
             this.book = (new EpubReader()).readEpub(epubInputStream);
         } catch (IOException e) {
             this.book = new Book();

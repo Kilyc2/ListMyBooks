@@ -4,18 +4,19 @@ import android.content.ContentResolver;
 import android.database.Cursor;
 import android.os.AsyncTask;
 
-import com.android.listmybooks.activities.BookLibraryActivity;
+import com.android.listmybooks.activities.BookListActivity;
 import com.android.listmybooks.data.BooksTable;
 import com.android.listmybooks.helpers.CursorHelper;
 import com.android.listmybooks.models.Book;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class FetchBooksTask extends AsyncTask<Void, Void, ArrayList<Book>> {
+public class FetchBooksTask extends AsyncTask<Void, Void, List<Book>> {
 
-    private BookLibraryActivity activity;
+    private BookListActivity activity;
 
-    public FetchBooksTask(BookLibraryActivity activity) {
+    public FetchBooksTask(BookListActivity activity) {
         this.activity = activity;
     }
 
@@ -26,17 +27,17 @@ public class FetchBooksTask extends AsyncTask<Void, Void, ArrayList<Book>> {
     }
 
     @Override
-    protected void onPostExecute(ArrayList<Book> books) {
+    protected void onPostExecute(List<Book> books) {
         super.onPostExecute(books);
         this.activity.onPostExecuteAsyncTask(books);
     }
 
     @Override
-    protected ArrayList<Book> doInBackground(Void... params) {
+    protected List<Book> doInBackground(Void... params) {
         ContentResolver contentResolver = this.activity.getContentResolver();
         Cursor cursor = contentResolver.query(BooksTable.getContentUri(),
                 null, null, null, null);
-        ArrayList<Book> favoritesMovies = new ArrayList<>();
+        List<Book> books = new ArrayList<>();
         if(CursorHelper.isValidCursor(cursor)) {
             do {
                 long id = cursor.getLong(cursor.getColumnIndex(BooksTable._ID));
@@ -48,11 +49,11 @@ public class FetchBooksTask extends AsyncTask<Void, Void, ArrayList<Book>> {
                         cursor.getColumnIndex(BooksTable.COLUMN_COVER_PATH));
                 String date = cursor.getString(
                         cursor.getColumnIndex(BooksTable.COLUMN_DATE));
-                Book movie = new Book(id, title, authors, coverPath, date);
-                favoritesMovies.add(movie);
+                Book book = new Book(id, title, authors, coverPath, date);
+                books.add(book);
             } while (cursor.moveToNext());
         }
         CursorHelper.closeCursor(cursor);
-        return favoritesMovies;
+        return books;
     }
 }

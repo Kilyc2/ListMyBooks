@@ -4,15 +4,17 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
 import com.android.listmybooks.R;
+import com.android.listmybooks.helpers.AlertHelper;
 import com.android.listmybooks.services.dropbox.FindEpubAsyncTask;
 import com.android.listmybooks.services.dropbox.SessionManager;
 
-public class LinkActivity extends LinkDropboxActivity {
+public class LinkActivity extends AppCompatActivity {
 
     private static final String ACCOUNT_PREFS_NAME = "prefs";
     private static final String ACCESS_KEY_NAME = "aKeyName";
@@ -20,6 +22,7 @@ public class LinkActivity extends LinkDropboxActivity {
 
     private Button linkButton;
     private SessionManager sessionManager;
+    protected ProgressBar spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,21 +42,18 @@ public class LinkActivity extends LinkDropboxActivity {
             }
         });
 
-        // Display the proper UI state if logged in or not
         if (sessionManager.isLinked()) {
             doLogIn();
         }
     }
 
     private void onClickLinkToDropbox() {
-        // Start the remote authentication
         sessionManager.startAuthentication(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // Store it locally in our app for later use
         String authentication = sessionManager.getAuthenticationOrNull();
         if (authentication != null) {
             storeAuth(authentication);
@@ -62,32 +62,43 @@ public class LinkActivity extends LinkDropboxActivity {
     }
 
     public void doLogOut() {
-        // Remove credentials from the session
         sessionManager.getSession().unlink();
-        // Clear our stored keys
         clearKeys();
     }
 
-    /**
-     * Convenience function to change UI state based on being logged in
-     */
+    public void onPreExecuteAsyncTask() {
+        this.spinner.setVisibility(View.VISIBLE);
+    }
+
+    public void onPostExecuteAsyncTask() {
+        this.spinner.setVisibility(View.INVISIBLE);
+        startListActivity();
+    }
+
+    public void showMessage(String message) {
+        AlertHelper.showAlertShort(this.spinner, message);
+    }
+
+    public String getExternalFilesDirPath() {
+        return getExternalFilesDir(null).getPath();
+    }
+
+    private void startListActivity() {
+        Intent intent = getListBooksIntent();
+        startActivity(intent);
+        finish();
+    }
+
     private void doLogIn() {
         linkButton.setVisibility(View.INVISIBLE);
-        // Set portrait orientation
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         new FindEpubAsyncTask(this, this.sessionManager.getSession()).execute();
     }
 
-    @Override
     protected Intent getListBooksIntent() {
         return new Intent(this, BookListActivity.class);
     }
 
-    /**
-     * Shows keeping the access keys returned from Trusted Authenticator in a local
-     * store, rather than storing user name & password, and re-authenticating each
-     * time (which is not to be done, ever).
-     */
     private void storeAuth(String oauth2AccessToken) {
         SharedPreferences prefs = getSharedPreferences(ACCOUNT_PREFS_NAME, 0);
         SharedPreferences.Editor edit = prefs.edit();

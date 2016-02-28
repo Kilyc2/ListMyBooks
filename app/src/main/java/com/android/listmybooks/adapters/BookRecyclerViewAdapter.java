@@ -16,16 +16,16 @@ import com.android.listmybooks.activities.BookDetailActivity;
 import com.android.listmybooks.fragments.BookDetailFragment;
 import com.android.listmybooks.models.Book;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class BookRecyclerViewAdapter
         extends RecyclerView.Adapter<BookRecyclerViewAdapter.ViewHolder> {
 
-    private final ArrayList<Book> books;
+    private final List<Book> books;
     private final boolean isTwoPane;
     private final FragmentManager fragmentManager;
 
-    public BookRecyclerViewAdapter(ArrayList<Book> books, boolean isTwoPane,
+    public BookRecyclerViewAdapter(List<Book> books, boolean isTwoPane,
                                    FragmentManager fragmentManager) {
         this.books = books;
         this.isTwoPane = isTwoPane;
