@@ -46,10 +46,6 @@ public class BookListActivity extends BookLibraryActivity {
             booksInLibrary = savedInstanceState.getParcelableArrayList(KEY_STATE_BOOKS);
         }
 
-        recyclerView = findViewById(R.id.book_list);
-        assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
-
         if (findViewById(R.id.book_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
@@ -57,6 +53,11 @@ public class BookListActivity extends BookLibraryActivity {
             // activity should be in two-pane mode.
             isTwoPane = true;
         }
+
+        recyclerView = findViewById(R.id.book_list);
+        assert recyclerView != null;
+        setupRecyclerView((RecyclerView) recyclerView);
+
     }
 
     @Override
@@ -64,45 +65,4 @@ public class BookListActivity extends BookLibraryActivity {
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(KEY_STATE_BOOKS, booksInLibrary);
     }
-
-//    public class FetchBooksTask extends AsyncTask<Void, Void, ArrayList<Book>> {
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//            spinner.setVisibility(View.VISIBLE);
-//        }
-//
-//        @Override
-//        protected ArrayList<Book> doInBackground(Void... params) {
-//            ContentResolver contentResolver = getContentResolver();
-//            Cursor cursor = contentResolver.query(BooksTable.getContentUri(),
-//                    null, null, null, null);
-//            ArrayList<Book> favoritesMovies = new ArrayList<>();
-//            if(CursorHelper.isValidCursor(cursor)) {
-//                do {
-//                    long id = cursor.getLong(cursor.getColumnIndex(BooksTable._ID));
-//                    String title = cursor.getString(
-//                            cursor.getColumnIndex(BooksTable.COLUMN_TITLE));
-//                    String authors = cursor.getString(
-//                            cursor.getColumnIndex(BooksTable.COLUMN_AUTHORS));
-//                    String coverPath = cursor.getString(
-//                            cursor.getColumnIndex(BooksTable.COLUMN_COVER_PATH));
-//                    String date = cursor.getString(
-//                            cursor.getColumnIndex(BooksTable.COLUMN_DATE));
-//                    Book movie = new Book(id, title, authors, coverPath, date);
-//                    favoritesMovies.add(movie);
-//                } while (cursor.moveToNext());
-//            }
-//            CursorHelper.closeCursor(cursor);
-//            return favoritesMovies;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(ArrayList<Book> books) {
-//            booksInLibrary = books;
-//            setupRecyclerView((RecyclerView) recyclerView);
-//            spinner.setVisibility(View.GONE);
-//        }
-//    }
 }

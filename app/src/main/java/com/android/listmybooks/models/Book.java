@@ -99,6 +99,14 @@ public class Book implements Parcelable {
         return authors;
     }
 
+    public String getAuthorsForDetail() {
+        String authorsString = "";
+        for (String author : authors) {
+            authorsString = authorsString.concat(author).concat("\n");
+        }
+        return authorsString;
+    }
+
     public String getAuthorsForDb() {
         String authorsString = "";
         for (String author : authors) {
@@ -112,14 +120,18 @@ public class Book implements Parcelable {
     }
 
     public Bitmap getCover() {
+        return Bitmap.createScaledBitmap(getCoverAsBitmap(), 400, 600, true);
+    }
+
+    public Bitmap getThumbnail() {
+        return Bitmap.createScaledBitmap(getCoverAsBitmap(), 150, 200, true);
+    }
+
+    private Bitmap getCoverAsBitmap() {
         if (this.coverPath.isEmpty()) {
             return null;
         }
         return BitmapFactory.decodeFile(this.coverPath, new BitmapFactory.Options());
-    }
-
-    public Bitmap getThumbnail() {
-        return Bitmap.createScaledBitmap(getCover(), 150, 200, true);
     }
 
     public Date getDate() {
