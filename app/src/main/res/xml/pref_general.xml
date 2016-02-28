@@ -1,0 +1,21 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference
+        android:defaultValue="@string/sort_order_title"
+        android:entries="@array/pref_sort_order_list_titles"
+        android:entryValues="@array/pref_sort_order_list_values"
+        android:key="sort_order_list"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/pref_title_sort_order_list" />
+
+    <ListPreference
+        android:defaultValue="@string/display_list"
+        android:entries="@array/pref_display_books_list_titles"
+        android:entryValues="@array/pref_display_books_list_values"
+        android:key="display_list"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/pref_title_display_list" />
+
+</PreferenceScreen>

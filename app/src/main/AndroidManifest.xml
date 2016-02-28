@@ -12,22 +12,19 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-
         <activity
             android:name=".activities.LinkActivity"
             android:launchMode="singleInstance">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.BookListActivity"
             android:label="@string/title_book_list"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".activities.BookDetailActivity"
             android:label="@string/title_book_detail"
@@ -37,16 +34,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.android.listmybooks.activities.BookListActivity" />
         </activity>
-
         <activity
             android:name="com.dropbox.client2.android.AuthActivity"
+            android:configChanges="orientation|keyboard"
             android:launchMode="singleTask"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            android:configChanges="orientation|keyboard">
-
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
             <intent-filter>
                 <data android:scheme="db-qwbz5mifusyu9ek" />
+
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -56,6 +53,14 @@
             android:name=".data.BooksProvider"
             android:authorities="com.android.listmybooks.data" />
 
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".activities.BookListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.android.listmybooks.activities.BookListActivity" />
+        </activity>
     </application>
 
 </manifest>

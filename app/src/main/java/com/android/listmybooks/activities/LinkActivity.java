@@ -60,11 +60,6 @@ public class LinkActivity extends AppCompatActivity {
         }
     }
 
-    public void doLogOut() {
-        sessionManager.getSession().unlink();
-        clearKeys();
-    }
-
     public void onPreExecuteAsyncTask() {
         this.spinner.setVisibility(View.VISIBLE);
     }
@@ -102,13 +97,6 @@ public class LinkActivity extends AppCompatActivity {
         SharedPreferences.Editor edit = prefs.edit();
         edit.putString(ACCESS_KEY_NAME, "oauth2:");
         edit.putString(ACCESS_SECRET_NAME, oauth2AccessToken);
-        edit.apply();
-    }
-
-    private void clearKeys() {
-        SharedPreferences prefs = getSharedPreferences(ACCOUNT_PREFS_NAME, 0);
-        SharedPreferences.Editor edit = prefs.edit();
-        edit.clear();
         edit.apply();
     }
 }

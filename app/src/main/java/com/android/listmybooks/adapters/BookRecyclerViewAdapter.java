@@ -22,28 +22,39 @@ public class BookRecyclerViewAdapter
         extends RecyclerView.Adapter<BookRecyclerViewAdapter.ViewHolder> {
 
     private final List<Book> books;
-    private final boolean isTwoPane;
+    private boolean isTwoPane;
     private final FragmentManager fragmentManager;
 
     public BookRecyclerViewAdapter(List<Book> books, boolean isTwoPane,
                                    FragmentManager fragmentManager) {
         this.books = books;
-        this.isTwoPane = isTwoPane;
         this.fragmentManager = fragmentManager;
+        this.isTwoPane = isTwoPane;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.book_list_content, parent, false);
-        return new ViewHolder(view);
+        View view;
+        boolean isLinearLayout = (boolean)parent.getTag();
+        if (isLinearLayout) {
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.book_list_content, parent, false);
+        } else {
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.book_grid_content, parent, false);
+        }
+        return new ViewHolder(view, isLinearLayout);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.book = books.get(position);
-        holder.thumbnail.setImageBitmap(books.get(position).getThumbnail());
-        holder.title.setText(books.get(position).getTitle());
+        if (holder.title != null) {
+            holder.title.setText(books.get(position).getTitle());
+            holder.thumbnail.setImageBitmap(books.get(position).getThumbnail());
+        } else {
+            holder.thumbnail.setImageBitmap(books.get(position).getCoverItem());
+        }
 
         holder.bookView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,11 +88,14 @@ public class BookRecyclerViewAdapter
         public final TextView title;
         public Book book;
 
-        public ViewHolder(View view) {
+        public ViewHolder(View view, boolean isLinearLayout) {
             super(view);
             bookView = view;
             thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
-            title = (TextView) view.findViewById(R.id.title);
+            if (isLinearLayout)
+                title = (TextView) view.findViewById(R.id.title);
+            else
+                title = null;
         }
 
         @Override

@@ -6,4 +6,39 @@
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit</string>
     <string name="action_share">Share</string>
     <string name="share_text">A must read book:</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="sort_order_title">title</string>
+    <string name="sort_order_date">date</string>
+
+    <string name="pref_title_sort_order_list">Sort order</string>
+    <string-array name="pref_sort_order_list_titles">
+        <item>Title</item>
+        <item>Date</item>
+    </string-array>
+    <string-array name="pref_sort_order_list_values">
+        <item>@string/sort_order_title</item>
+        <item>@string/sort_order_date</item>
+    </string-array>
+
+    <string name="display_list">list</string>
+    <string name="display_grid">grid</string>
+
+    <string name="pref_title_display_list">Display books</string>
+    <string-array name="pref_display_books_list_titles">
+        <item>List</item>
+        <item>Grid</item>
+    </string-array>
+    <string-array name="pref_display_books_list_values">
+        <item>@string/display_list</item>
+        <item>@string/display_grid</item>
+    </string-array>
+
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+
+    <string name="pref_title_unlink">Unlink from Dropbox</string>
+
 </resources>

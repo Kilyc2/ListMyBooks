@@ -125,6 +125,10 @@ public class Book implements Parcelable {
         return Bitmap.createScaledBitmap(getCoverAsBitmap(), 150, 200, true);
     }
 
+    public Bitmap getCoverItem() {
+        return Bitmap.createScaledBitmap(getCoverAsBitmap(), 200, 300, true);
+    }
+
     private Bitmap getCoverAsBitmap() {
         if (this.coverPath.isEmpty()) {
             return null;
