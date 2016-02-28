@@ -1,0 +1,51 @@
+List My Books
+
+He desarrollado una app que se conecta a la cuenta de Dropbox del usuario y obtiene un listado de sus libros que se puede 
+configurar para ver en lista o cuadricula y ordenada por titulo y por fecha de modificación en Dropbox. Además se puede 
+ver el detalle de un libro (titulo, portada y autor).
+
+He querido usar una arquitectura MVC, intentando que la Vista fuera casi exclusiva de los xml, el Controlador fueran los 
+activities y el Modelo lo formarán las otras clases. A causa del tiempo que tenía no he podido estructurarlo todo como 
+me hubiera gustado. Además no he hecho ningún test, cosa que no recomiendo, pero tenía miedo de que no llegara al plazo. 
+Por último, he intentado que el código fuera lo más limpio posible, aunque se puede mejorar sin duda. Mi idea original 
+era usar Clean Architecture y TDD pero no estaba seguro de poder acabar la app entonces.
+
+Lo primero por lo que opté fue por conectarme a Dropbox y encontrar los libros, tuve que estudiar la API que tienen para 
+poder encontrar los métodos que necesitaba. Tenía que crear un AsyncTask para utilizar estos métodos. La AsyncTask la 
+separé a otra clase a la que he tenido que pasarle el activity. Además he separado la sesión y los métodos de la API en 
+dos clases para que estuviera todo más organizado.
+
+Por otro lado tenía que poder obtener la información de los epub, necesitaba otra librería para obtener la carátula, el 
+titulo y autores, encontré una que parecía útil. 
+
+Entonces me di cuenta de que tenía que descargar los epub al dispositivo. Lo metí en el AsyncTask encargado de buscar los 
+epubs en Dropbox y los guardé. 
+
+La búsqueda de los epub se hace cada vez que se inicia la app, buscando nuevos libros para incluir. Como no quería descargar 
+una y otra vez los epub al dispositivo hice que comprobara si el archivo ya estaba guardado previamente comprobando que el 
+fichero no existiera y que el tamaño en bytes fuera el mismo.
+
+Para evitar que al girar el dispositivo los AsyncTask dieran problemas he usado WeakReferences, así no da ese problema, lo 
+ideal hubiera sido trabajar con WorkFragments, pero no me ha dado tiempo.
+
+Los libros ya estaban en el dispositivo y podía leerlos. Lo siguiente era pasar los datos entre las activities, pensé que 
+la mejor opción era guardarlos en una base de datos SQLite con una tabla para los libros, así podría obtenerlos fácilmente 
+para que el ListActivity los mostrara. He usado ContentProvider para manejar los cursores.
+
+Para mostrar los libros usé un RecyclerLayout ya que pensé que era fácil para cambiar el LayoutManager de Linear a Grid. 
+He tenido problemas con el adapter en algunos casos y he leído mucha información para usarlo como quería.
+
+Para el detalle de los libros he mostrado el titulo con la carátula y los autores. He incluido un fab que comparte un 
+mensaje con los libros interesantes. También incluí una CollapsingToolbar con una imagen. 
+
+La lista en modo grid no me ha quedado muy bien, pero no me ha dado tiempo a más, lo suyo hubiera sido tener en cuenta el 
+tamaño de la pantalla y modificar el tamaño de las imágenes y/o el numero de las columnas.
+
+He procurado que se vea también en tablets (he probado con una de 7'').
+
+Por último he hecho las opciones de cambiar de lista a cuadricula y de ordenar por titulo o fecha. He usado Preferences y 
+que he capturado en el OnResume de la ListActivity y usando el notifyDataSetChanged del adapter, después de hacer los 
+cambios oportunos, he cambiado la manera de mostrar los datos.
+
+Ha sido una app muy entretenida de hacer, aunque me gustaría darle algún repaso, en especial organizar todo mejor. Espero 
+que sea de su agrado.
