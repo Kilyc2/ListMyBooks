@@ -20,20 +20,21 @@ import java.util.List;
 
 public class FindEpubAsyncTask extends AsyncTask<Void, Void, Void> {
 
-    private LinkActivity activity;
     private ApiManager apiManager;
     WeakReference<Activity> weakActivity;
 
     public FindEpubAsyncTask(LinkActivity activity, AndroidAuthSession session) {
-        this.activity = activity;
         this.apiManager = new ApiManager(session);
+        this.weakActivity = new WeakReference<Activity>(activity);
     }
 
     @Override
     protected void onPreExecute() {
-        super.onPreExecute();
-        this.weakActivity = new WeakReference<Activity>(this.activity);
-        this.activity.onPreExecuteAsyncTask();
+        Activity activity = this.weakActivity.get();
+        if (activity != null) {
+            super.onPreExecute();
+            ((LinkActivity)activity).onPreExecuteAsyncTask();
+        }
     }
 
     @Override
@@ -41,20 +42,20 @@ public class FindEpubAsyncTask extends AsyncTask<Void, Void, Void> {
         Activity activity = this.weakActivity.get();
         if (activity != null) {
             super.onPostExecute(aVoid);
-            this.activity.onPostExecuteAsyncTask();
+            ((LinkActivity)activity).onPostExecuteAsyncTask();
         }
     }
 
     @Override
     protected Void doInBackground(Void... params) {
-        this.activity.showMessage("Searching .epub files from Dropbox");
+        ((LinkActivity)this.weakActivity.get()).showMessage("Searching .epub files from Dropbox");
         List<Entry> epubs = getEpubsFromApi();
-        this.activity.showMessage("Preparing library");
+        ((LinkActivity)this.weakActivity.get()).showMessage("Preparing library");
         for (Entry epub : epubs) {
             try {
                 prepareEpub(epub);
             } catch (IOException ioe) {
-                this.activity.showMessage("Can't open ".concat(epub.fileName()));
+                ((LinkActivity)this.weakActivity.get()).showMessage("Can't open ".concat(epub.fileName()));
             }
         }
         return null;
@@ -65,7 +66,8 @@ public class FindEpubAsyncTask extends AsyncTask<Void, Void, Void> {
     }
 
     private boolean prepareEpub(Entry epub) throws IOException {
-        File file = FileHelper.createFile(this.activity.getExternalFilesDirPath(), epub.fileName());
+        File file = FileHelper.createFile(((LinkActivity)this.weakActivity.get())
+                .getExternalFilesDirPath(), epub.fileName());
         return prepareEpubInMemory(epub, file);
     }
 
@@ -74,7 +76,8 @@ public class FindEpubAsyncTask extends AsyncTask<Void, Void, Void> {
     }
 
     private boolean saveBookInMemory(Entry epub, File file) {
-        this.activity.showMessage(epub.fileName().concat(" is being added to the library"));
+        ((LinkActivity)this.weakActivity.get()).showMessage(epub.fileName()
+                .concat(" is being added to the library"));
         boolean isDonwloaded = this.apiManager.downloadFile(file, epub.path);
         if (isDonwloaded) {
             Book book = new Book(file.getPath(), DateHelper.getDateFormated(epub.modified));
@@ -84,7 +87,7 @@ public class FindEpubAsyncTask extends AsyncTask<Void, Void, Void> {
     }
 
     private void saveBookInDB(Book book) {
-        ContentResolver contentResolver = this.activity.getContentResolver();
+        ContentResolver contentResolver = this.weakActivity.get().getContentResolver();
         contentResolver.insert(BooksTable.getContentUri(), BooksTable.getValuesBook(book));
     }
 
