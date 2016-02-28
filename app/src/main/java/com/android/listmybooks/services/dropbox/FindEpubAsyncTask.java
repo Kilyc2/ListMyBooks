@@ -1,10 +1,12 @@
 package com.android.listmybooks.services.dropbox;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.os.AsyncTask;
 
 import com.android.listmybooks.activities.LinkActivity;
 import com.android.listmybooks.data.BooksTable;
+import com.android.listmybooks.helpers.DateHelper;
 import com.android.listmybooks.helpers.FileHelper;
 import com.android.listmybooks.models.Book;
 import com.dropbox.client2.DropboxAPI;
@@ -13,12 +15,14 @@ import com.dropbox.client2.android.AndroidAuthSession;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 public class FindEpubAsyncTask extends AsyncTask<Void, Void, Void> {
 
     private LinkActivity activity;
     private ApiManager apiManager;
+    WeakReference<Activity> weakActivity;
 
     public FindEpubAsyncTask(LinkActivity activity, AndroidAuthSession session) {
         this.activity = activity;
@@ -28,13 +32,17 @@ public class FindEpubAsyncTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        this.weakActivity = new WeakReference<Activity>(this.activity);
         this.activity.onPreExecuteAsyncTask();
     }
 
     @Override
     protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
-        this.activity.onPostExecuteAsyncTask();
+        Activity activity = this.weakActivity.get();
+        if (activity != null) {
+            super.onPostExecute(aVoid);
+            this.activity.onPostExecuteAsyncTask();
+        }
     }
 
     @Override
@@ -69,7 +77,7 @@ public class FindEpubAsyncTask extends AsyncTask<Void, Void, Void> {
         this.activity.showMessage(epub.fileName().concat(" is being added to the library"));
         boolean isDonwloaded = this.apiManager.downloadFile(file, epub.path);
         if (isDonwloaded) {
-            Book book = new Book(file.getPath(), epub.modified);
+            Book book = new Book(file.getPath(), DateHelper.getDateFormated(epub.modified));
             saveBookInDB(book);
         }
         return isDonwloaded;

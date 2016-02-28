@@ -26,12 +26,12 @@ public class BooksProvider extends ContentProvider {
         return true;
     }
 
-    private Cursor getBooks() {
+    private Cursor getBooks(String sortOrder) {
         SQLiteQueryBuilder booksQueryBuilder = new SQLiteQueryBuilder();
         booksQueryBuilder.setTables(BooksTable.TABLE_NAME);
 
         return booksQueryBuilder.query(dbHelper.getReadableDatabase(), null,
-                null, null, null, null, null);
+                null, null, null, null, sortOrder);
     }
 
     private Cursor getBook(Uri uri) {
@@ -69,7 +69,7 @@ public class BooksProvider extends ContentProvider {
         Cursor returnCursor;
         switch (sUriMatcher.match(uri)) {
             case BOOK: {
-                returnCursor = getBooks();
+                returnCursor = getBooks(sortOrder);
                 break;
             }
             case BOOK_ID: {

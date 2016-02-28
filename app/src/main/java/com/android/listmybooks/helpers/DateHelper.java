@@ -7,6 +7,7 @@ import java.util.Locale;
 
 public class DateHelper {
     private static final DateFormat dateFormat;
+    private static final DateFormat dateFormatString;
 
     public static Date parseDate(String date) {
         try {
@@ -16,7 +17,12 @@ public class DateHelper {
         }
     }
 
+    public static String getDateFormated(String date) {
+        return dateFormatString.format(parseDate(date)).toString();
+    }
+
     static {
         dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy kk:mm:ss ZZZZZ", Locale.US);
+        dateFormatString = new SimpleDateFormat("yyyyMMddkkmmss", Locale.US);
     }
 }

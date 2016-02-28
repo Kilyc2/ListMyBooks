@@ -2,7 +2,6 @@ package com.android.listmybooks.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -22,7 +21,7 @@ public class LinkActivity extends AppCompatActivity {
 
     private Button linkButton;
     private SessionManager sessionManager;
-    protected ProgressBar spinner;
+    private ProgressBar spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +90,6 @@ public class LinkActivity extends AppCompatActivity {
 
     private void doLogIn() {
         linkButton.setVisibility(View.INVISIBLE);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         new FindEpubAsyncTask(this, this.sessionManager.getSession()).execute();
     }
 

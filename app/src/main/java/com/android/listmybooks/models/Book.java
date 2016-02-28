@@ -6,12 +6,10 @@ import android.graphics.BitmapFactory;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.android.listmybooks.helpers.DateHelper;
 import com.android.listmybooks.services.epubreader.EpubManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 public class Book implements Parcelable {
@@ -134,11 +132,7 @@ public class Book implements Parcelable {
         return BitmapFactory.decodeFile(this.coverPath, new BitmapFactory.Options());
     }
 
-    public Date getDate() {
-        return DateHelper.parseDate(date);
-    }
-
-    public String getDateForDb() {
+    public String getDate() {
         return date;
     }
 

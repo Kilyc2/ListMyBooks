@@ -1,5 +1,6 @@
 package com.android.listmybooks.services;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -9,12 +10,14 @@ import com.android.listmybooks.data.BooksTable;
 import com.android.listmybooks.helpers.CursorHelper;
 import com.android.listmybooks.models.Book;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FetchBooksTask extends AsyncTask<Void, Void, List<Book>> {
+public class FetchBooksTask extends AsyncTask<String, Void, List<Book>> {
 
     private BookListActivity activity;
+    WeakReference<Activity> weakActivity;
 
     public FetchBooksTask(BookListActivity activity) {
         this.activity = activity;
@@ -23,20 +26,25 @@ public class FetchBooksTask extends AsyncTask<Void, Void, List<Book>> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        this.weakActivity = new WeakReference<Activity>(this.activity);
         this.activity.onPreExecuteAsyncTask();
     }
 
     @Override
     protected void onPostExecute(List<Book> books) {
-        super.onPostExecute(books);
-        this.activity.onPostExecuteAsyncTask(books);
+        Activity activity = this.weakActivity.get();
+        if (activity != null) {
+            super.onPostExecute(books);
+            this.activity.onPostExecuteAsyncTask(books);
+        }
     }
 
     @Override
-    protected List<Book> doInBackground(Void... params) {
+    protected List<Book> doInBackground(String... params) {
+        String sortOrder = params[0];
         ContentResolver contentResolver = this.activity.getContentResolver();
         Cursor cursor = contentResolver.query(BooksTable.getContentUri(),
-                null, null, null, null);
+                null, null, null, sortOrder);
         List<Book> books = new ArrayList<>();
         if(CursorHelper.isValidCursor(cursor)) {
             do {

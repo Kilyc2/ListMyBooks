@@ -72,7 +72,7 @@ public class BooksTable implements BaseColumns {
         values.put(COLUMN_TITLE, book.getTitle());
         values.put(COLUMN_AUTHORS, book.getAuthorsForDb());
         values.put(COLUMN_COVER_PATH, book.getCoverPath());
-        values.put(COLUMN_DATE, book.getDateForDb());
+        values.put(COLUMN_DATE, book.getDate());
         return values;
     }
 }
