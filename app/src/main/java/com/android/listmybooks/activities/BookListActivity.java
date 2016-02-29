@@ -57,7 +57,7 @@ public class BookListActivity extends AppCompatActivity {
 
         if(savedInstanceState == null || !savedInstanceState.containsKey(KEY_STATE_BOOKS)) {
             FetchBooksTask fetchBooksTask = new FetchBooksTask(this);
-            fetchBooksTask.execute();
+            fetchBooksTask.execute(sortOrder);
         } else {
             List<Book> books = savedInstanceState.getParcelableArrayList(KEY_STATE_BOOKS);
             setLibrary(books);

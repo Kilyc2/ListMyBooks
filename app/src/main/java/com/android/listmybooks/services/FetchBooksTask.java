@@ -14,7 +14,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FetchBooksTask extends AsyncTask<Void, Void, List<Book>> {
+public class FetchBooksTask extends AsyncTask<String, Void, List<Book>> {
 
     WeakReference<Activity> weakActivity;
 
@@ -41,10 +41,11 @@ public class FetchBooksTask extends AsyncTask<Void, Void, List<Book>> {
     }
 
     @Override
-    protected List<Book> doInBackground(Void... params) {
+    protected List<Book> doInBackground(String... params) {
+        String sortOrder = params[0];
         ContentResolver contentResolver = this.weakActivity.get().getContentResolver();
         Cursor cursor = contentResolver.query(BooksTable.getContentUri(),
-                null, null, null, BooksTable.COLUMN_TITLE);
+                null, null, null, sortOrder);
         List<Book> books = new ArrayList<>();
         if(CursorHelper.isValidCursor(cursor)) {
             do {
